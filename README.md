@@ -16,6 +16,7 @@ npm test
 - blacklist and whitelist through options
 - black and white lists to be glob pattern, regex, string, array or function
 - different identifier than IP (defaults to `this.ip`) through `opts.id`
+- `opts.forbidden` for custom message when `403 Forbidden`
 
 
 ## Usage
@@ -30,6 +31,7 @@ var app = koa()
 
 app
 .use(ipFilter({
+  forbidden: '403: Get out of here!'
   blacklist: ['123.*.*.77', '8.8.8.8']
 }))
 .use(helloWorld())
@@ -37,8 +39,8 @@ app
 app.listen(1234)
 console.log('koa server start listening on http://localhost:1234')
 
-// if your IP (let say 123.48.92.77) not match to blacklisted IPs
-// it will display 'Hello World'
+// if your IP (let say 123.48.92.77) not match to `opts.blacklist`ed IPs
+// it will display 'Hello World', otherwise '403: Get out of here!'
 ```
 
 
