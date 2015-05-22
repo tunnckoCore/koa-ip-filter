@@ -54,6 +54,18 @@ test('koa-ip-filter:', function () {
       .expect(200, 'Hello World')
       .end(done)
   })
+  test('should support custom message for 403 Forbidden', function (done) {
+    var app = middleware({
+      accessForbidden: '403, Get out of here!',
+      blacklist: ['1.2.3.4']
+    })
+
+    request(app.callback())
+      .get('/')
+      .set('x-koaip', '1.2.3.4')
+      .expect(403, '403, Get out of here!')
+      .end(done)
+  })
   test('should support blacklist option', function () {
     test('expect `403 Forbidden` when array blacklist and match', function (done) {
       var app = middleware({
