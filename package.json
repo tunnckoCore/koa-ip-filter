@@ -1,0 +1,41 @@
+{
+  "name": "koa-ip-filter",
+  "version": "0.0.0",
+  "description": "Filter IPs with a glob pattern, regex, string, array or matcher function. Support whitelist, blacklist and id options.",
+  "repository": "tunnckoCore/koa-ip-filter",
+  "author": "Charlike Mike Reagent <@tunnckoCore> (http://www.tunnckocore.tk)",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "standard && node test.js"
+  },
+  "dependencies": {
+    "is-match": "^0.2.0",
+    "statuses": "^1.2.1"
+  },
+  "devDependencies": {
+    "assertit": "^0.1.0",
+    "extend-shallow": "^1.1.4",
+    "koa": "^0.20.0",
+    "koa-hello-world": "^1.0.0",
+    "supertest": "^1.0.1"
+  },
+  "keywords": [
+    "array",
+    "blacklist",
+    "filter",
+    "function",
+    "glob",
+    "id",
+    "ip",
+    "ips",
+    "match",
+    "matcher",
+    "options",
+    "pattern",
+    "regex",
+    "string",
+    "support",
+    "whitelist"
+  ]
+}
