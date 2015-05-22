@@ -66,6 +66,20 @@ test('koa-ip-filter:', function () {
       .expect(403, '403, Get out of here!')
       .end(done)
   })
+  test('should be able opts.forbidden to be function', function (done) {
+    var app = middleware({
+      forbidden: function (ctx) {
+        return 'Get out of here!'
+      },
+      blacklist: ['123.*.*.77']
+    })
+
+    request(app.callback())
+      .get('/')
+      .set('x-koaip', '123.48.92.77')
+      .expect(403, 'Get out of here!')
+      .end(done)
+  })
   test('should support blacklist option', function () {
     test('expect `403 Forbidden` when array blacklist and match', function (done) {
       var app = middleware({

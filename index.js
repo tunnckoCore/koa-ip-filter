@@ -24,8 +24,8 @@ module.exports = function koaIpFilter (options) {
     var whitelist = options.whitelist || options.whiteList
     var forbidden = options.forbidden || '403 ' + statuses[403]
 
-    if (forbidden === 'function') {
-      forbidden = options.forbidden.call(this, this, 403)
+    if (typeof forbidden === 'function') {
+      forbidden = forbidden.call(this, this)
     }
 
     var whiteMatch = whitelist ? micromatch(whitelist) : null
