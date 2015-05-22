@@ -56,7 +56,7 @@ test('koa-ip-filter:', function () {
   })
   test('should support custom message for 403 Forbidden', function (done) {
     var app = middleware({
-      accessForbidden: '403, Get out of here!',
+      forbidden: '403, Get out of here!',
       blacklist: ['1.2.3.4']
     })
 

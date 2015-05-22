@@ -22,18 +22,23 @@ module.exports = function koaIpFilter (options) {
 
     var blacklist = options.blacklist || options.blackList
     var whitelist = options.whitelist || options.whiteList
+    var forbidden = options.forbidden || '403 ' + statuses[403]
+
+    if (forbidden === 'function') {
+      forbidden = options.forbidden.call(this, this, 403)
+    }
 
     var whiteMatch = whitelist ? micromatch(whitelist) : null
     if (whiteMatch && !whiteMatch(id)) {
       this.status = 403
-      this.body = options.accessForbidden || '403 ' + statuses[403]
+      this.body = forbidden
       return
     }
 
     var blackMatch = blacklist ? micromatch(blacklist) : null
     if (blackMatch && blackMatch(id)) {
       this.status = 403
-      this.body = options.accessForbidden || '403 ' + statuses[403]
+      this.body = forbidden
       return
     }
 
