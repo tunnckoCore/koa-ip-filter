@@ -14,8 +14,8 @@ npm test
 
 ## Features
 - blacklist and whitelist through options
-- different id option (defaults to `this.ip`)
 - black and white lists to be glob pattern, regex, string, array or function
+- different identifier than IP (defaults to `this.ip`) through `opts.id`
 
 
 ## Usage
@@ -24,18 +24,21 @@ npm test
 ```js
 var koa = require('koa')
 var ipFilter = require('koa-ip-filter')
+var helloWorld = require('koa-hello-world')
 
 var app = koa()
 
 app
 .use(ipFilter({
-  blacklist: ['1.2.*.*', '8.8.8.8']
+  blacklist: ['123.*.*.77', '8.8.8.8']
 }))
-.use(function * () {
-  this.body = 'Hello World'
-})
+.use(helloWorld())
+
 app.listen(1234)
-// will display `Hello World` if IP not match to blacklisted IPs
+console.log('koa server start listening on http://localhost:1234')
+
+// if your IP (let say 123.48.92.77) not match to blacklisted IPs
+// it will display 'Hello World'
 ```
 
 
