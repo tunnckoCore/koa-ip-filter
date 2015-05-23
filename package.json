@@ -1,6 +1,6 @@
 {
   "name": "koa-ip-filter",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Filter IPs with a glob pattern, regex, string, array or matcher function. Support whitelist, blacklist and id options.",
   "repository": "tunnckoCore/koa-ip-filter",
   "author": "Charlike Mike Reagent <@tunnckoCore> (http://www.tunnckocore.tk)",
