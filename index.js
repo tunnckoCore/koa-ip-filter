@@ -10,6 +10,18 @@
 var micromatch = require('is-match')
 var statuses = require('statuses')
 
+/**
+ * > Filtering incoming request with glob patterns
+ * array, regexp, string or matcher function
+ *
+ * @param  {Object} `options`
+ *   @option {Function} [options] `id` custom identifier, defaults to `this.ip`
+ *   @option {Array|String|RegExp|Function} [options] `blacklist` blacklist filter
+ *   @option {Array|String|RegExp|Function} [options] `whitelist` whitelist filter
+ *   @option {String|Function} [options] `forbidden` message to display when 403 forbidden
+ * @return {GeneratorFunction}
+ * @api public
+ */
 module.exports = function koaIpFilter (options) {
   options = typeof options === 'object' ? options : {}
 

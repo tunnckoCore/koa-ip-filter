@@ -22,6 +22,18 @@ npm test
 ## Usage
 > For more use-cases see the [tests](./test.js)
 
+### [koaIpFilter](./index#L25)
+> Filtering incoming request with glob patterns array, regexp, string or matcher function
+
+- `[options]` **{Object}**
+  + `[id]` **{Function}** custom identifier, defaults to `this.ip`
+  + `[blacklist]` **{Array|String|RegExp|Function}** blacklist filter
+  + `[whitelist]` **{Array|String|RegExp|Function}** whitelist filter
+  + `[forbidden]` **{String|Function}** message to display when 403 forbidden
+- `return` **{GeneratorFunction}**
+
+**example.js**
+
 ```js
 var koa = require('koa')
 var ipFilter = require('koa-ip-filter')
