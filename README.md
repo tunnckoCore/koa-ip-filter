@@ -35,6 +35,8 @@ npm test
 **example.js**
 
 ```js
+'use strict'
+
 var koa = require('koa')
 var ipFilter = require('koa-ip-filter')
 var helloWorld = require('koa-hello-world')
@@ -43,7 +45,7 @@ var app = koa()
 
 app
 .use(ipFilter({
-  forbidden: '403: Get out of here!'
+  forbidden: '403: Get out of here!',
   blacklist: ['123.*.*.77', '8.8.8.8']
 }))
 .use(helloWorld())
