@@ -23,6 +23,10 @@ npm test
 - would restrict all to `403 Forbidden` that not match to filter
 
 
+> **Notice:** In the next middleware you will have `this.filter` method which is [ip-filter](https://github.com/tunnckoCore/ip-filter)  
+> and `this.identifier` - the IP/ID that passed the given filter
+
+
 ## Usage
 > For more use-cases see the [tests](./test.js)
 
@@ -36,7 +40,32 @@ npm test
   + `forbidden` **{String|Function}** custom message when `403 Forbidden` response
 - `returns` **{GeneratorFunction}**
 
-**example.js**
+**Example**
+```js
+'use strict'
+
+var koa = require('koa')
+var ipFilter = require('koa-ip-filter')
+var helloWorld = require('koa-hello-world')
+
+var app = koa()
+
+app
+.use(ipFilter({
+  forbidden: '403: Get out of here!',
+  filter: ['127.??.6*.12', '!1.2.*.4']
+}))
+.use(helloWorld())
+
+app.listen(1234)
+console.log('koa server start listening on http://localhost:1234')
+
+// if your IP is `127.43.65.12` you will see `Hello World`
+// otherwise you will see `403: Get out of here!`
+```
+
+### One more example
+> If you want to allow all IPs, but want to restrict only some range
 
 ```js
 'use strict'
@@ -50,15 +79,15 @@ var app = koa()
 app
 .use(ipFilter({
   forbidden: '403: Get out of here!',
-  blacklist: ['123.*.*.77', '8.8.8.8']
+  filter: ['*', '!213.15.*']
 }))
 .use(helloWorld())
 
 app.listen(1234)
 console.log('koa server start listening on http://localhost:1234')
 
-// if your IP (let say 123.48.92.77) not match to `opts.blacklist`ed IPs
-// it will display 'Hello World', otherwise '403: Get out of here!'
+// only user with IP starting with `213.15.*` 
+// will see the message `403: Get out of here!`
 ```
 
 

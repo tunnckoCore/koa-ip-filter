@@ -13,6 +13,30 @@ var ipFilter = require('ip-filter')
  * > Filtering incoming request with glob patterns
  * array, regexp, string or matcher function
  *
+ * **Example**
+ * ```js
+ * 'use strict'
+ *
+ * var koa = require('koa')
+ * var ipFilter = require('koa-ip-filter')
+ * var helloWorld = require('koa-hello-world')
+ *
+ * var app = koa()
+ *
+ * app
+ * .use(ipFilter({
+ *   forbidden: '403: Get out of here!',
+ *   filter: ['127.??.6*.12', '!1.2.*.4']
+ * }))
+ * .use(helloWorld())
+ *
+ * app.listen(1234)
+ * console.log('koa server start listening on http://localhost:1234')
+ *
+ * // if your IP is `127.43.65.12` you will see `Hello World`
+ * // otherwise you will see `403: Get out of here!`
+ * ```
+ *
  * @name  koaIpFilter
  * @param  {Object} `options`
  *   @option {Function} [options] `id` custom identifier, defaults to `this.ip`
