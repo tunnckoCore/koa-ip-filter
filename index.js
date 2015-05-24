@@ -7,8 +7,7 @@
 
 'use strict'
 
-var micromatch = require('is-match')
-var statuses = require('statuses')
+var ipFilter = require('ip-filter')
 
 /**
  * > Filtering incoming request with glob patterns
@@ -16,8 +15,8 @@ var statuses = require('statuses')
  *
  * @param  {Object} `options`
  *   @option {Function} [options] `id` custom identifier, defaults to `this.ip`
- *   @option {Array|String|RegExp|Function} [options] `blacklist` blacklist filter
- *   @option {Array|String|RegExp|Function} [options] `whitelist` whitelist filter
+ *   @option {Boolean} [options] `strict` to throw when not valid ip? default `true`
+ *   @option {Array|String|RegExp|Function} [options] `filter` black/white list filter
  *   @option {String|Function} [options] `forbidden` message to display when 403 forbidden
  * @return {GeneratorFunction}
  * @api public
@@ -32,27 +31,19 @@ module.exports = function koaIpFilter (options) {
       return yield * next
     }
 
-    var blacklist = options.blacklist || options.blackList
-    var whitelist = options.whitelist || options.whiteList
-    var forbidden = options.forbidden || '403 ' + statuses[403]
+    var filter = options.filter || '*'
+    var strict = typeof options.strict === 'boolean' ? options.strict : true
+    var forbidden = options.forbidden || '403 Forbidden'
 
-    if (typeof forbidden === 'function') {
-      forbidden = forbidden.call(this, this)
-    }
-
-    var whiteMatch = whitelist ? micromatch(whitelist) : null
-    if (whiteMatch && !whiteMatch(id)) {
+    var identifier = ipFilter(id, filter, !strict)
+    if (identifier === null) {
       this.status = 403
-      this.body = forbidden
+      this.body = typeof forbidden === 'function' ? forbidden.call(this, this) : forbidden
       return
     }
 
-    var blackMatch = blacklist ? micromatch(blacklist) : null
-    if (blackMatch && blackMatch(id)) {
-      this.status = 403
-      this.body = forbidden
-      return
-    }
+    this.filter = ipFilter
+    this.identifier = identifier
 
     return yield * next
   }

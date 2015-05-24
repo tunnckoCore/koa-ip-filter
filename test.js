@@ -57,7 +57,7 @@ test('koa-ip-filter:', function () {
   test('should support custom message for 403 Forbidden', function (done) {
     var app = middleware({
       forbidden: '403, Get out of here!',
-      blacklist: ['1.2.3.4']
+      filter: ['!1.2.3.4']
     })
 
     request(app.callback())
@@ -71,19 +71,19 @@ test('koa-ip-filter:', function () {
       forbidden: function (ctx) {
         return 'Get out of here!'
       },
-      blacklist: ['123.*.*.77']
+      filter: ['123.48.*.77', '!123.*.192.??']
     })
 
     request(app.callback())
       .get('/')
-      .set('x-koaip', '123.48.92.77')
+      .set('x-koaip', '123.48.192.77')
       .expect(403, 'Get out of here!')
       .end(done)
   })
   test('should support blacklist option', function () {
     test('expect `403 Forbidden` when array blacklist and match', function (done) {
       var app = middleware({
-        blacklist: ['1.2.3.4']
+        filter: ['1.2.*.4', '!1.2.3.4']
       })
 
       request(app.callback())
@@ -92,10 +92,10 @@ test('koa-ip-filter:', function () {
         .expect(403, '403 Forbidden')
         .end(done)
     })
-    test('expect `403 Forbidden` when blacklist function return truthy', function (done) {
+    test('expect `403 Forbidden` when blacklist function return falsey', function (done) {
       var app = middleware({
-        blacklist: function (ip) {
-          return ip.indexOf('1.2.3') !== -1
+        filter: function (ip) {
+          return ip.indexOf('1.2.3') === -1
         },
         id: function () {
           return this.request.header['x-koaip']
@@ -112,18 +112,18 @@ test('koa-ip-filter:', function () {
   test('should support whitelist option', function () {
     test('expect `200 OK`: ip match to whitelist', function (done) {
       var app = middleware({
-        whitelist: ['1.2.3.4', '1.2.3.7']
+        filter: ['127.??.6*.12', '!1.2.*.4']
       })
 
       request(app.callback())
         .get('/')
-        .set('x-koaip', '1.2.3.7')
+        .set('x-koaip', '127.43.65.12')
         .expect(200, 'Hello World')
         .end(done)
     })
     test('expect `403 Forbidden`: ip not match to whitelist (glob patterns)', function (done) {
       var app = middleware({
-        whitelist: ['1.2.3.*']
+        filter: ['1.2.3.*']
       })
 
       request(app.callback())

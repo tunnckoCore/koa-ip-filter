@@ -10,8 +10,7 @@
     "test": "standard && node test.js"
   },
   "dependencies": {
-    "is-match": "^0.2.0",
-    "statuses": "^1.2.1"
+    "ip-filter": "~1.0.0"
   },
   "devDependencies": {
     "assertit": "^0.1.0",
