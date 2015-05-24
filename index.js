@@ -13,11 +13,12 @@ var ipFilter = require('ip-filter')
  * > Filtering incoming request with glob patterns
  * array, regexp, string or matcher function
  *
+ * @name  koaIpFilter
  * @param  {Object} `options`
  *   @option {Function} [options] `id` custom identifier, defaults to `this.ip`
- *   @option {Boolean} [options] `strict` to throw when not valid ip? default `true`
+ *   @option {Boolean} [options] `strict` to throw when not valid IPv4/IPv6? default `true`
  *   @option {Array|String|RegExp|Function} [options] `filter` black/white list filter
- *   @option {String|Function} [options] `forbidden` message to display when 403 forbidden
+ *   @option {String|Function} [options] `forbidden` custom message when `403 Forbidden` response
  * @return {GeneratorFunction}
  * @api public
  */

@@ -15,24 +15,26 @@ npm test
 
 
 ## Features
-- blacklist and whitelist through options
-- black and white lists to be glob pattern, regex, string, array or function
-- different identifier than IP (defaults to `this.ip`) through `opts.id`
-- `opts.forbidden` for custom message when `403 Forbidden`
+- custom message when `403 Forbidden` response, through `opts.forbidden`
+- custom identifier different than default `this.ip`, through `opts.id`
+  + you may want to add `opts.strict: false` if it's not IP
+- filter IP using glob patterns, regexp, string, array or function
+- blacklist with negative glob patterns, whitelist with positive
+- would restrict all to `403 Forbidden` that not match to filter
 
 
 ## Usage
 > For more use-cases see the [tests](./test.js)
 
-### [koaIpFilter](./index#L25)
+### [koaIpFilter](./index.js#L26)
 > Filtering incoming request with glob patterns array, regexp, string or matcher function
 
-- `[options]` **{Object}**
-  + `[id]` **{Function}** custom identifier, defaults to `this.ip`
-  + `[blacklist]` **{Array|String|RegExp|Function}** blacklist filter
-  + `[whitelist]` **{Array|String|RegExp|Function}** whitelist filter
-  + `[forbidden]` **{String|Function}** message to display when 403 forbidden
-- `return` **{GeneratorFunction}**
+- `options` **{Object}**
+  + `id` **{Function}** custom identifier, defaults to `this.ip`
+  + `strict` **{Boolean}** to throw when not valid IPv4/IPv6? default `true`
+  + `filter` **{Array|String|RegExp|Function}** filter
+  + `forbidden` **{String|Function}** custom message when `403 Forbidden` response
+- `returns` **{GeneratorFunction}**
 
 **example.js**
 
