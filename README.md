@@ -1,6 +1,6 @@
 # koa-ip-filter [![npmjs.com][npmjs-img]][npmjs-url] [![The MIT License][license-img]][license-url]
 
-> Filter IPs with a glob pattern, regex, string, array or matcher function. Support whitelist, blacklist and id options.
+> [koa](https://github.com/koajs/koa) middleware to filter request IPs or custom ID with glob patterns, array, string, regexp or matcher function. Support custom `403 Forbidden` message and custom ID.
 
 [![code climate][codeclimate-img]][codeclimate-url] [![standard code style][standard-img]][standard-url] [![travis build status][travis-img]][travis-url] [![coverage status][coveralls-img]][coveralls-url] [![dependency status][david-img]][david-url]
 
