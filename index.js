@@ -52,15 +52,14 @@ module.exports = function koaIpFilter (options) {
   return function * (next) {
     var id = typeof options.id === 'function' ? options.id.call(this, this) : this.ip
 
-    if (!id) {
+    if (!id || !options.filter) {
       return yield * next
     }
 
-    var filter = options.filter || '*'
     var strict = typeof options.strict === 'boolean' ? options.strict : true
     var forbidden = options.forbidden || '403 Forbidden'
 
-    var identifier = ipFilter(id, filter, !strict)
+    var identifier = ipFilter(id, options.filter, !strict)
     if (identifier === null) {
       this.status = 403
       this.body = typeof forbidden === 'function' ? forbidden.call(this, this) : forbidden

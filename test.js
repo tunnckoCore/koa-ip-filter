@@ -12,134 +12,118 @@
 var test = require('assertit')
 var ipFilter = require('./index')
 var request = require('supertest')
-var extend = require('extend-shallow')
 var helloWorld = require('koa-hello-world')
 var koa = require('koa')
 
-function middleware (opts) {
-  opts = extend({
-    id: function (ctx) {
-      // `ctx` is same as `this`
-      return this.request.header['x-koaip']
-    }
-  }, opts)
-
-  return koa()
-    .use(ipFilter(opts))
-    .use(helloWorld())
-}
-
 test('koa-ip-filter:', function () {
-  test('should say "Hello World"', function (done) {
-    var app = middleware()
+  test('should yield next middleware if no `opts.filter` given', function (done) {
+    var server = koa().use(ipFilter()).use(helloWorld()).callback()
 
-    request(app.callback())
+    request(server)
       .get('/')
       .expect(200, 'Hello World')
       .end(done)
   })
-  test('should have support for id option', function (done) {
-    var app = middleware({
-      id: function (ctx) {
-        var ip = ctx.request.header['koa-ip']
-        ctx.set('koa-ip', ip)
-        return ip
+  test('should have `opts.id` and it should be binded to koa this', function (done) {
+    var server = koa().use(ipFilter({
+      id: function _id_ (ctx) {
+        this.set('x-github-username', 'tunnckoCore')
+        return ctx.request.header['x-koaip']
       }
-    })
+    })).use(helloWorld()).callback()
 
-    request(app.callback())
+    request(server)
       .get('/')
-      .set('koa-ip', '6.2.4.4')
-      .expect('koa-ip', '6.2.4.4')
+      .expect('x-github-username', 'tunnckoCore')
+      .expect(200, 'Hello World')
+      .end(done)
+  })
+  test('should `403 Forbidden` if not match to `opts.filter`', function (done) {
+    var server = koa().use(ipFilter({
+      id: function () {
+        return this.request.header['x-koaip']
+      },
+      filter: '1.2.3.*'
+    })).use(helloWorld()).callback()
+
+    request(server)
+      .get('/')
+      .set('x-koaip', '4.4.8.8')
+      .expect(403, '403 Forbidden')
+      .end(done)
+  })
+  test('should `403 Forbidden` if IP is in blacklist', function (done) {
+    var server = koa().use(ipFilter({
+      id: function () {
+        return this.request.header['x-koaip']
+      },
+      filter: ['*', '!89.???.30.*']
+    })).use(helloWorld()).callback()
+
+    request(server)
+      .get('/')
+      .set('x-koaip', '89.111.30.8')
+      .expect(403, '403 Forbidden')
+      .end(done)
+  })
+  test('should `200 OK` if not in blacklist range', function (done) {
+    var server = koa().use(ipFilter({
+      id: function () {
+        return this.request.header['x-koaip']
+      },
+      filter: ['*', '!89.???.30.*']
+    })).use(helloWorld()).callback()
+
+    request(server)
+      .get('/')
+      .set('x-koaip', '4.4.8.8')
       .expect(200, 'Hello World')
       .end(done)
   })
   test('should support custom message for 403 Forbidden', function (done) {
-    var app = middleware({
-      forbidden: '403, Get out of here!',
-      filter: ['!1.2.3.4']
-    })
+    var server = koa().use(ipFilter({
+      id: function () {
+        return this.request.header['x-koaip']
+      },
+      filter: ['*', '!89.???.30.*'],
+      forbidden: '403, Get out of here!'
+    })).use(helloWorld()).callback()
 
-    request(app.callback())
+    request(server)
       .get('/')
-      .set('x-koaip', '1.2.3.4')
+      .set('x-koaip', '89.111.30.8')
       .expect(403, '403, Get out of here!')
       .end(done)
   })
-  test('should be able opts.forbidden to be function', function (done) {
-    var app = middleware({
-      forbidden: function (ctx) {
-        return 'Get out of here!'
+  test('should be able `opts.forbidden` to be function', function (done) {
+    var server = koa().use(ipFilter({
+      id: function () {
+        return this.request.header['x-koaip']
       },
-      filter: ['123.48.*.77', '!123.*.192.??']
-    })
+      filter: '123.225.23.120',
+      forbidden: function (ctx) {
+        this.set('X-Forbidden', 'Can be function')
+        ctx.set('X-Seriously', 'yes')
+        return 'opts.forbidden can be function'
+      }
+    })).use(helloWorld()).callback()
 
-    request(app.callback())
+    request(server)
       .get('/')
-      .set('x-koaip', '123.48.192.77')
-      .expect(403, 'Get out of here!')
+      .set('x-koaip', '55.55.55.55')
+      .expect('X-Forbidden', 'Can be function')
+      .expect('X-Seriously', 'yes')
+      .expect(403, 'opts.forbidden can be function')
       .end(done)
-  })
-  test('should support blacklist option', function () {
-    test('expect `403 Forbidden` when array blacklist and match', function (done) {
-      var app = middleware({
-        filter: ['1.2.*.4', '!1.2.3.4']
-      })
-
-      request(app.callback())
-        .get('/')
-        .set('x-koaip', '1.2.3.4')
-        .expect(403, '403 Forbidden')
-        .end(done)
-    })
-    test('expect `403 Forbidden` when blacklist function return falsey', function (done) {
-      var app = middleware({
-        filter: function (ip) {
-          return ip.indexOf('1.2.3') === -1
-        },
-        id: function () {
-          return this.request.header['x-koaip']
-        }
-      })
-
-      request(app.callback())
-        .get('/')
-        .set('x-koaip', '1.2.3.4')
-        .expect(403, '403 Forbidden')
-        .end(done)
-    })
-  })
-  test('should support whitelist option', function () {
-    test('expect `200 OK`: ip match to whitelist', function (done) {
-      var app = middleware({
-        filter: ['127.??.6*.12', '!1.2.*.4']
-      })
-
-      request(app.callback())
-        .get('/')
-        .set('x-koaip', '127.43.65.12')
-        .expect(200, 'Hello World')
-        .end(done)
-    })
-    test('expect `403 Forbidden`: ip not match to whitelist (glob patterns)', function (done) {
-      var app = middleware({
-        filter: ['1.2.3.*']
-      })
-
-      request(app.callback())
-        .get('/')
-        .set('x-koaip', '7.7.7.7')
-        .expect(403, '403 Forbidden')
-        .end(done)
-    })
   })
   test('should have `this.filter` and `this.identifier` in next middleware', function (done) {
     var ok = false
-    var app = middleware({
+    var server = koa()
+    .use(ipFilter({
       filter: ['*', '!213.15.*']
-    })
-
-    app.use(function * (next) {
+    }))
+    .use(helloWorld())
+    .use(function * (next) {
       test.ok(this.filter, 'should have `this.filter` in next')
       test.ok(this.identifier, 'should have `this.identifier` in next')
       test.equal(typeof this.filter, 'function', 'should have `this.filter` method')
@@ -147,9 +131,26 @@ test('koa-ip-filter:', function () {
       ok = true
     })
 
-    request(app.callback())
+    request(server.callback())
       .get('/')
       .set('x-koaip', '7.7.7.7')
+      .expect(200, 'Hello World')
+      .end(function (err) {
+        test.ifError(err)
+        test.equal(ok, true)
+        done()
+      })
+  })
+  test('should not have `this.filter` if no `opts.filter` given', function (done) {
+    var ok = false
+    var server = koa().use(ipFilter()).use(helloWorld()).use(function * () {
+      test.ok(!this.filter, 'should not have `this.filter` in next')
+      test.ok(!this.identifier, 'should not have `this.identifier` in next')
+      ok = true
+    }).callback()
+
+    request(server)
+      .get('/')
       .expect(200, 'Hello World')
       .end(function (err) {
         test.ifError(err)
