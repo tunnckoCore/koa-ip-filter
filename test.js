@@ -133,4 +133,28 @@ test('koa-ip-filter:', function () {
         .end(done)
     })
   })
+  test('should have `this.filter` and `this.identifier` in next middleware', function (done) {
+    var ok = false
+    var app = middleware({
+      filter: ['*', '!213.15.*']
+    })
+
+    app.use(function * (next) {
+      test.ok(this.filter, 'should have `this.filter` in next')
+      test.ok(this.identifier, 'should have `this.identifier` in next')
+      test.equal(typeof this.filter, 'function', 'should have `this.filter` method')
+      test.equal(typeof this.identifier, 'string', 'should have `this.identifier`')
+      ok = true
+    })
+
+    request(app.callback())
+      .get('/')
+      .set('x-koaip', '7.7.7.7')
+      .expect(200, 'Hello World')
+      .end(function (err) {
+        test.ifError(err)
+        test.equal(ok, true)
+        done()
+      })
+  })
 })
