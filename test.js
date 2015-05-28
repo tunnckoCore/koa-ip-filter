@@ -5,7 +5,7 @@
  * Released under the MIT license.
  */
 
-/* jshint asi:true */
+/* jshint asi:true, esnext:true */
 
 'use strict'
 
@@ -15,9 +15,13 @@ var request = require('supertest')
 var helloWorld = require('koa-hello-world')
 var koa = require('koa')
 
+function middleware (fn) {
+  return koa().use(fn).use(helloWorld()).callback()
+}
+
 test('koa-ip-filter:', function () {
   test('should yield next middleware if no `opts.filter` given', function (done) {
-    var server = koa().use(ipFilter()).use(helloWorld()).callback()
+    var server = middleware(ipFilter())
 
     request(server)
       .get('/')
@@ -25,12 +29,12 @@ test('koa-ip-filter:', function () {
       .end(done)
   })
   test('should have `opts.id` and it should be binded to koa this', function (done) {
-    var server = koa().use(ipFilter({
+    var server = middleware(ipFilter({
       id: function _id_ (ctx) {
         this.set('x-github-username', 'tunnckoCore')
         return ctx.request.header['x-koaip']
       }
-    })).use(helloWorld()).callback()
+    }))
 
     request(server)
       .get('/')
@@ -39,12 +43,12 @@ test('koa-ip-filter:', function () {
       .end(done)
   })
   test('should `403 Forbidden` if not match to `opts.filter`', function (done) {
-    var server = koa().use(ipFilter({
+    var server = middleware(ipFilter({
       id: function () {
         return this.request.header['x-koaip']
       },
       filter: '1.2.3.*'
-    })).use(helloWorld()).callback()
+    }))
 
     request(server)
       .get('/')
@@ -53,12 +57,12 @@ test('koa-ip-filter:', function () {
       .end(done)
   })
   test('should `403 Forbidden` if IP is in blacklist', function (done) {
-    var server = koa().use(ipFilter({
+    var server = middleware(ipFilter({
       id: function () {
         return this.request.header['x-koaip']
       },
       filter: ['*', '!89.???.30.*']
-    })).use(helloWorld()).callback()
+    }))
 
     request(server)
       .get('/')
@@ -67,12 +71,12 @@ test('koa-ip-filter:', function () {
       .end(done)
   })
   test('should `200 OK` if not in blacklist range', function (done) {
-    var server = koa().use(ipFilter({
+    var server = middleware(ipFilter({
       id: function () {
         return this.request.header['x-koaip']
       },
       filter: ['*', '!89.???.30.*']
-    })).use(helloWorld()).callback()
+    }))
 
     request(server)
       .get('/')
@@ -81,13 +85,13 @@ test('koa-ip-filter:', function () {
       .end(done)
   })
   test('should support custom message for 403 Forbidden', function (done) {
-    var server = koa().use(ipFilter({
+    var server = middleware(ipFilter({
       id: function () {
         return this.request.header['x-koaip']
       },
       filter: ['*', '!89.???.30.*'],
       forbidden: '403, Get out of here!'
-    })).use(helloWorld()).callback()
+    }))
 
     request(server)
       .get('/')
@@ -96,7 +100,7 @@ test('koa-ip-filter:', function () {
       .end(done)
   })
   test('should be able `opts.forbidden` to be function', function (done) {
-    var server = koa().use(ipFilter({
+    var server = middleware(ipFilter({
       id: function () {
         return this.request.header['x-koaip']
       },
@@ -106,7 +110,7 @@ test('koa-ip-filter:', function () {
         ctx.set('X-Seriously', 'yes')
         return 'opts.forbidden can be function'
       }
-    })).use(helloWorld()).callback()
+    }))
 
     request(server)
       .get('/')
@@ -129,6 +133,7 @@ test('koa-ip-filter:', function () {
       test.equal(typeof this.filter, 'function', 'should have `this.filter` method')
       test.equal(typeof this.identifier, 'string', 'should have `this.identifier`')
       ok = true
+      yield next
     })
 
     request(server.callback())
@@ -143,10 +148,11 @@ test('koa-ip-filter:', function () {
   })
   test('should not have `this.filter` if no `opts.filter` given', function (done) {
     var ok = false
-    var server = koa().use(ipFilter()).use(helloWorld()).use(function * () {
+    var server = koa().use(ipFilter()).use(helloWorld()).use(function * (next) {
       test.ok(!this.filter, 'should not have `this.filter` in next')
       test.ok(!this.identifier, 'should not have `this.identifier` in next')
       ok = true
+      yield next
     }).callback()
 
     request(server)
