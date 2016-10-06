@@ -56,10 +56,9 @@ module.exports = function koaIpFilter (options) {
       return yield * next
     }
 
-    var strict = typeof options.strict === 'boolean' ? options.strict : true
     var forbidden = options.forbidden || '403 Forbidden'
 
-    var identifier = ipFilter(id, options.filter, !strict)
+    var identifier = ipFilter(id, options.filter, options)
     if (identifier === null) {
       this.status = 403
       this.body = typeof forbidden === 'function' ? forbidden.call(this, this) : forbidden

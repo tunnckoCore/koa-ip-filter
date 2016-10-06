@@ -75,7 +75,9 @@ test('koa-ip-filter:', function () {
       id: function () {
         return this.request.header['x-koaip']
       },
-      filter: ['*', '!89.???.30.*']
+      // it can be double star - globstar
+      // or *.*.*.*
+      filter: ['*.*.*.*', '!89.???.30.*']
     }))
 
     request(server)
@@ -124,7 +126,9 @@ test('koa-ip-filter:', function () {
     var ok = false
     var server = koa()
     .use(ipFilter({
-      filter: ['*', '!213.15.*']
+      // it can be double star - globstar
+      // or *.*.*.*
+      filter: ['**', '!213.15.*']
     }))
     .use(helloWorld())
     .use(function * (next) {
