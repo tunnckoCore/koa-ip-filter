@@ -1,14 +1,22 @@
 sudo: false
-language: "node_js"
+language: node_js
+
 node_js:
+  - "node"
+  - "6"
+  - "5"
+  - "4"
   - "0.12"
-  - "iojs"
-before_script:
-  - npm install standard
-  - standard
-script:
-  - npm install istanbul-harmony
-  - node --harmony node_modules/.bin/istanbul cover test.js --report lcovonly
-after_script:
-  - npm install coveralls
-  - cat ./coverage/lcov.info | coveralls
+  - "0.10"
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - node_js: "4"
+    - node_js: "0.10"
+    - node_js: "0.12"
+
+notifications:
+  email: false
+
+after_success: npm run report-coverage

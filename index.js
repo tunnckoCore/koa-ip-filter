@@ -14,6 +14,7 @@ var ipFilter = require('ip-filter')
  * array, regexp, string or matcher function
  *
  * **Example**
+ *
  * ```js
  * 'use strict'
  *
@@ -46,11 +47,14 @@ var ipFilter = require('ip-filter')
  * @return {GeneratorFunction}
  * @api public
  */
+
 module.exports = function koaIpFilter (options) {
   options = typeof options === 'object' ? options : {}
 
   return function * (next) {
-    var id = typeof options.id === 'function' ? options.id.call(this, this) : this.ip
+    var id = typeof options.id === 'function'
+      ? options.id.call(this, this)
+      : this.ip
 
     if (!id || !options.filter) {
       return yield * next
@@ -61,7 +65,9 @@ module.exports = function koaIpFilter (options) {
     var identifier = ipFilter(id, options.filter, options)
     if (identifier === null) {
       this.status = 403
-      this.body = typeof forbidden === 'function' ? forbidden.call(this, this) : forbidden
+      this.body = typeof forbidden === 'function'
+        ? forbidden.call(this, this)
+        : forbidden
       return
     }
 
