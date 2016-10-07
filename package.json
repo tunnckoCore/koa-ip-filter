@@ -82,7 +82,8 @@
         "ip-filter",
         "koa-ip-filter",
         "koa-better-body",
-        "micromatch"
+        "micromatch",
+        "is-match-ip"
       ]
     },
     "reflinks": [
