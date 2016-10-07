@@ -36,10 +36,10 @@ test('should have `opts.id` and it should be binded to koa this', function (done
     }
   }))
 
-  request(server)
-    .get('/')
+  request(server).get('/')
     .expect('x-github-username', 'tunnckoCore')
-    .expect(200, 'Hello World')
+    .expect(200)
+    .expect('Hello World')
     .end(done)
 })
 
@@ -51,24 +51,18 @@ test('should `403 Forbidden` if not match to `opts.filter`', function (done) {
     filter: '1.2.3.*'
   }))
 
-  request(server)
-    .get('/')
-    .set('x-koaip', '4.4.8.8')
-    .expect(403, '403 Forbidden')
-    .end(done)
+  request(server).get('/').set('x-koaip', '4.4.8.8')
+    .expect('403 Forbidden').expect(403, done)
 })
 
 test('should `403 Forbidden` if IP is in blacklist', function (done) {
-  var server = middleware(ipFilter({
+  request(middleware(ipFilter({
     id: function () {
       return this.request.header['x-koaip']
     },
     filter: ['*', '!89.???.30.*']
-  }))
-
-  request(server)
-    .get('/')
-    .set('x-koaip', '89.111.30.8')
+  })))
+    .get('/').set('x-koaip', '89.111.30.8')
     .expect(403, '403 Forbidden')
     .end(done)
 })
@@ -83,9 +77,7 @@ test('should `200 OK` if not in blacklist range', function (done) {
     // or *.*.*.*
     filter: ['*.*.*.*', '!111.??.244.*']
   })
-  var server = middleware(mw)
-
-  request(server)
+  request(middleware(mw))
     .get('/')
     .set('x-koaip', '4.4.8.8')
     .expect(200, 'Hello World')
@@ -170,8 +162,8 @@ test('should not have `this.filter` if no `opts.filter` given', function (done) 
 
   request(server)
     .get('/')
-    .expect(200, 'Hello World')
-    .end(function (err) {
+    .expect('Hello World')
+    .expect(200, function (err) {
       test.ifError(err)
       test.equal(ok, true)
       done()
