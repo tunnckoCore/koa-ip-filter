@@ -1,7 +1,7 @@
 /*!
  * koa-ip-filter <https://github.com/tunnckoCore/koa-ip-filter>
  *
- * Copyright (c) 2015 Charlike Mike Reagent, contributors.
+ * Copyright (c) 2015-2016 Charlike Mike Reagent, contributors.
  * Released under the MIT license.
  */
 
