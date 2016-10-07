@@ -74,14 +74,16 @@ test('should `403 Forbidden` if IP is in blacklist', function (done) {
 })
 
 test('should `200 OK` if not in blacklist range', function (done) {
-  var server = middleware(ipFilter({
+  var mw = ipFilter({
     id: function () {
-      return this.request.header['x-koaip']
+      var header = this.request.header['x-koaip']
+      return header
     },
     // it can be double star - globstar
     // or *.*.*.*
-    filter: ['*.*.*.*', '!89.???.30.*']
-  }))
+    filter: ['*.*.*.*', '!111.??.244.*']
+  })
+  var server = middleware(mw)
 
   request(server)
     .get('/')
