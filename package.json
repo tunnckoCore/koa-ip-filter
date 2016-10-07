@@ -1,23 +1,44 @@
 {
   "name": "koa-ip-filter",
   "version": "2.0.0",
-  "description": "koa middleware to filter request IPs or custom ID with glob patterns, array, string, regexp or matcher function. Support custom `403 Forbidden` message and custom ID.",
+  "description": "Middleware for [koa][] that filters IPs against glob patterns, RegExp, string or array of globs. Support custom `403 Forbidden` message and custom ID.",
   "repository": "tunnckoCore/koa-ip-filter",
   "author": "Charlike Mike Reagent <@tunnckoCore> (http://www.tunnckocore.tk)",
+  "precommit.silent": true,
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "standard && node test.js"
+    "lint": "standard --verbose",
+    "pretest": "npm run lint",
+    "test": "npm run coverage",
+    "posttest": "npm run lint:coverage",
+    "coverage": "nyc node test.js",
+    "lint:coverage": "nyc check-coverage --lines 100 --branches 100 --statements 100 --functions 100",
+    "report-coverage": "nyc report --reporter=text-lcov | coveralls",
+    "prerelease": "npm test",
+    "release": "standard-version --sign --no-verify",
+    "precommit": "git add --all",
+    "commit": "git-cz"
   },
   "dependencies": {
     "ip-filter": "^2.0.0"
   },
   "devDependencies": {
-    "assertit": "^0.1.0",
-    "koa": "^0.21.0",
+    "commitizen": "^2.8.6",
+    "coveralls": "^2.11.12",
+    "cz-conventional-changelog": "^1.2.0",
+    "koa": "^1.2.4",
     "koa-hello-world": "^1.0.1",
-    "supertest": "^1.0.1"
+    "mukla": "^0.4.1",
+    "nyc": "^8.1.0",
+    "pre-commit": "^1.1.3",
+    "standard": "^8.0.0",
+    "standard-version": "^2.4.0",
+    "supertest": "^2.0.0"
   },
+  "files": [
+    "index.js"
+  ],
   "keywords": [
     "array",
     "blacklist",
@@ -42,5 +63,36 @@
     "string",
     "support",
     "whitelist"
-  ]
+  ],
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "verb": {
+    "run": true,
+    "toc": false,
+    "layout": "empty",
+    "tasks": [
+      "readme"
+    ],
+    "related": {
+      "list": [
+        "is-match",
+        "ip-filter",
+        "koa-ip-filter",
+        "koa-better-body",
+        "micromatch"
+      ]
+    },
+    "reflinks": [
+      "ip-filter",
+      "micromatch",
+      "is-match",
+      "koa"
+    ],
+    "lint": {
+      "reflinks": true
+    }
+  }
 }
