@@ -1,6 +1,6 @@
 {
   "name": "koa-ip-filter",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Middleware for [koa][] that filters IPs against glob patterns, RegExp, string or array of globs. Support custom `403 Forbidden` message and custom ID.",
   "repository": "tunnckoCore/koa-ip-filter",
   "author": "Charlike Mike Reagent <@tunnckoCore> (http://www.tunnckocore.tk)",
